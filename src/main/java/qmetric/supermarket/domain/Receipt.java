@@ -1,11 +1,14 @@
 package qmetric.supermarket.domain;
 
 import java.math.BigDecimal;
+import java.util.Formatter;
 
 /**
  * Created by andrzejfolga on 01/05/2017.
  */
 public class Receipt {
+    public static final String TEMPLATE = "%-15s %-4.2f\n";
+
     private final Basket basket;
     private final BigDecimal finalPrice;
 
@@ -20,17 +23,13 @@ public class Receipt {
 
     public String print() {
         StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb);
         sb.append(basket.toString());
-        sb.append("\t\t\t\t---\n");
-        sb.append("Sub-total\t\t");
-        sb.append(finalPrice);
-        sb.append("\n\n");
-        sb.append("Savings");
-        sb.append("Total savings\t\t\t");
-        sb.append(BigDecimal.ZERO);
-        sb.append("-----------------------");
-        sb.append("Total to Pay\t\t\t");
-        sb.append(finalPrice);
+        formatter.format(TEMPLATE, "Sub-total", finalPrice);
+        sb.append("Savings\n");
+        formatter.format(TEMPLATE, "Total savings", BigDecimal.ZERO);
+        sb.append("--------------------\n");
+        formatter.format(TEMPLATE, "Total to Pay", finalPrice);
         return sb.toString();
     }
 }
