@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * Created by andrzejfolga on 01/05/2017.
  */
-public class ItemsScanner {
+public class BasketScanner {
 
     private PromitionRepositoryPort promitionRepositoryPort;
 
-    public ItemsScanner(PromitionRepositoryPort promitionRepositoryPort) {
+    public BasketScanner(PromitionRepositoryPort promitionRepositoryPort) {
         this.promitionRepositoryPort = promitionRepositoryPort;
     }
 

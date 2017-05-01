@@ -24,7 +24,7 @@ import static qmetric.supermarket.domain.ItemType.*;
  * Created by andrzejfolga on 01/05/2017.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ItemsScannerTest {
+public class BasketScannerTest {
 
     public static final PriceDefinition HALF_POUND_PER_ITEM = new PriceDefinition(new BigDecimal("0.50"), Unit.ITEM);
     public static final PriceDefinition SEVENTY_PENCE_PER_ITEM = new PriceDefinition(new BigDecimal("0.70"), Unit.ITEM);
@@ -32,11 +32,11 @@ public class ItemsScannerTest {
     @Mock
     private PromitionRepositoryPort promitionRepositoryPort;
     @InjectMocks
-    private ItemsScanner itemsScanner;
+    private BasketScanner basketScanner;
 
     @Before
     public void setUp() throws Exception {
-        itemsScanner = new ItemsScanner(promitionRepositoryPort);
+        basketScanner = new BasketScanner(promitionRepositoryPort);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ItemsScannerTest {
         List<Promotion> promotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
         Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
-        Receipt receipt = itemsScanner.scan(basket);
+        Receipt receipt = basketScanner.scan(basket);
 
         assertThat(receipt.getTotalToPay(), is(new BigDecimal("2.50")));
     }
@@ -60,7 +60,7 @@ public class ItemsScannerTest {
         List<Promotion> promotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
         Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
-        Receipt receipt = itemsScanner.scan(basket);
+        Receipt receipt = basketScanner.scan(basket);
 
         assertThat(receipt.getTotalToPay(), is(new BigDecimal("1.00")));
     }
@@ -74,7 +74,7 @@ public class ItemsScannerTest {
         List<Promotion> promotions = Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0")));
         Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
-        Receipt receipt = itemsScanner.scan(basket);
+        Receipt receipt = basketScanner.scan(basket);
 
         assertThat(receipt.getTotalToPay(), is(new BigDecimal("2.70")));
     }
@@ -86,18 +86,17 @@ public class ItemsScannerTest {
         List<Promotion> promotions = Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0")));
         Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
-        Receipt receipt = itemsScanner.scan(basket);
+        Receipt receipt = basketScanner.scan(basket);
 
         assertThat(receipt.getTotalToPay(), is(new BigDecimal("0.70")));
     }
-
 
     @Test
     public void shouldApplyWeightForPriceDefinition() throws Exception {
         Basket basket = new Basket();
         basket.add(new Item(ORANGES, POUND_NINETY_NINE_PENCE_PER_KG, new BigDecimal("0.20")));
 
-        Receipt receipt = itemsScanner.scan(basket);
+        Receipt receipt = basketScanner.scan(basket);
 
         assertThat(receipt.getTotalToPay(), is(new BigDecimal("0.40")));
     }

@@ -73,7 +73,7 @@ public class Basket {
     public BigDecimal calculateSubTotal() {
         BigDecimal subTotal = BigDecimal.ZERO;
         for (Item item : items.values()) {
-            subTotal = subTotal.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity()));
+            subTotal = subTotal.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_EVEN);
         }
         return subTotal;
     }
@@ -82,7 +82,7 @@ public class Basket {
         BigDecimal totalAfterPromotions = BigDecimal.ZERO;
         for (Item item : items.values()) {
             if (hasNoPromotion(item)) {
-                totalAfterPromotions = totalAfterPromotions.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity()));
+                totalAfterPromotions = totalAfterPromotions.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_EVEN);
             }
         }
         return totalAfterPromotions;
