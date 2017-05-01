@@ -19,18 +19,11 @@ public class ReceiptBuilder {
     }
 
     public Receipt build() {
-        BigDecimal totalToPay = BigDecimal.ZERO;
-        BigDecimal subTotal = basket.calculateSubTotal();
-        for (Promotion promotion : availablePromotions) {
-            Item item = basket.findItemForType(promotion.getItemType());
-            if (item != null) {
-                totalToPay = totalToPay.add(promotion.apply(item));
-                basket.promotionApplied(promotion, item, totalToPay);
-            }
-        }
+        BigDecimal totalToPay = basket.calculatePromotions(availablePromotions);
         BigDecimal afterPromotionsSubTotal = basket.calculateRemainder();
         totalToPay = totalToPay.add(afterPromotionsSubTotal);
-        return new Receipt(basket, subTotal, totalToPay);
+        BigDecimal subTotal = basket.calculateSubTotal();
+        return new Receipt(basket, new ReceiptSummary(subTotal, totalToPay));
     }
 
 }

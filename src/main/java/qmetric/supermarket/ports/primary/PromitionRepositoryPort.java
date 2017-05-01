@@ -1,4 +1,4 @@
-package qmetric.supermarket.ports;
+package qmetric.supermarket.ports.primary;
 
 import qmetric.supermarket.domain.Basket;
 import qmetric.supermarket.domain.promotion.Promotion;

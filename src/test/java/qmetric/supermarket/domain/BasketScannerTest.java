@@ -10,7 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import qmetric.supermarket.domain.promotion.Promotion;
 import qmetric.supermarket.domain.promotion.ThreeForTwoPromotion;
 import qmetric.supermarket.domain.promotion.TwoForPricePromotion;
-import qmetric.supermarket.ports.PromitionRepositoryPort;
+import qmetric.supermarket.ports.primary.PromitionRepositoryPort;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

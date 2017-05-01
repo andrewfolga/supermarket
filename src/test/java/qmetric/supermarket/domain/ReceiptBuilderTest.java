@@ -1,5 +1,6 @@
 package qmetric.supermarket.domain;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import qmetric.supermarket.domain.promotion.Promotion;
@@ -9,7 +10,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static qmetric.supermarket.domain.ItemType.BEANS;
 import static qmetric.supermarket.domain.ItemType.ORANGES;
 
@@ -18,82 +21,64 @@ import static qmetric.supermarket.domain.ItemType.ORANGES;
  */
 public class ReceiptBuilderTest {
 
+    public static final BigDecimal ZERO_AMOUNT = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_EVEN);
     private ReceiptBuilder receiptBuilder;
-
-    private static final String BASIC_RECEIPT =
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Sub-total             1.50\n" +
-            "Savings\n" +
-            "Total savings         0.00\n" +
-            "--------------------------\n" +
-            "Total to Pay          1.50\n";
-
-    private static final String PROMOTION_RECEIPT =
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Sub-total             1.50\n" +
-            "Savings\n" +
-            "Beans 3 for 2        -0.50\n" +
-            "Total savings        -0.50\n" +
-            "--------------------------\n" +
-            "Total to Pay          1.00\n";
-
-    private static final String PROMOTION_AND_PRICE_DEFINITION_RECEIPT =
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Beans                 0.50\n" +
-            "Oranges\n" +
-            "0.200 kg @ £1.99/kg   0.40\n" +
-            "Sub-total             1.90\n" +
-            "Savings\n" +
-            "Beans 3 for 2        -0.50\n" +
-            "Total savings        -0.50\n" +
-            "--------------------------\n" +
-            "Total to Pay          1.40\n";
 
     @Test
     public void shouldBuildBasicReceipt() throws Exception {
-
         List<Promotion> availablePromotions = Arrays.asList();
         Basket basket = new Basket();
-        basket.add(new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3)));
+        Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
+        basket.add(item);
 
         receiptBuilder = new ReceiptBuilder(availablePromotions, basket);
         Receipt receipt = receiptBuilder.build();
 
-        String receiptPrintOut = receipt.printOut();
-        Assert.assertThat(receiptPrintOut, is(BASIC_RECEIPT));
+        Assert.assertThat(receipt.getItems(), hasItems(item));
+        Assert.assertThat(receipt.getPromotions(), empty());
+        Assert.assertThat(receipt.getPromotionSavings().entrySet(), Matchers.hasSize(0));
+        Assert.assertThat(receipt.getSubTotal(), is(equalTo(new BigDecimal("1.50"))));
+        Assert.assertThat(receipt.getTotalSavings(), is(equalTo(ZERO_AMOUNT)));
+        Assert.assertThat(receipt.getTotalToPay(), is(equalTo(new BigDecimal("1.50"))));
     }
 
     @Test
     public void shouldBuildReceiptWithPromotions() throws Exception {
-
-        List<Promotion> availablePromotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
+        ThreeForTwoPromotion threeForTwoPromotion = new ThreeForTwoPromotion(BEANS);
+        List<Promotion> availablePromotions = Arrays.asList(threeForTwoPromotion);
         Basket basket = new Basket();
-        basket.add(new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3)));
+        Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
+        basket.add(item);
         receiptBuilder = new ReceiptBuilder(availablePromotions, basket);
+
         Receipt receipt = receiptBuilder.build();
 
-        String receiptPrintOut = receipt.printOut();
-        System.out.println(receiptPrintOut);
-        Assert.assertThat(receiptPrintOut, is(PROMOTION_RECEIPT));
+        Assert.assertThat(receipt.getItems(), hasItems(item));
+        Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));
+        Assert.assertThat(receipt.getPromotionSavings(), hasEntry(threeForTwoPromotion.getPromotionType(), new BigDecimal("-0.50")));
+        Assert.assertThat(receipt.getSubTotal(), is(equalTo(new BigDecimal("1.50"))));
+        Assert.assertThat(receipt.getTotalSavings(), is(equalTo(new BigDecimal("-0.50"))));
+        Assert.assertThat(receipt.getTotalToPay(), is(equalTo(new BigDecimal("1.00"))));
     }
 
     @Test
     public void shouldBuildReceiptWithPromotionsAndPriceDefinitions() throws Exception {
-
-        List<Promotion> availablePromotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
+        ThreeForTwoPromotion threeForTwoPromotion = new ThreeForTwoPromotion(BEANS);
+        List<Promotion> availablePromotions = Arrays.asList(threeForTwoPromotion);
         Basket basket = new Basket();
-        basket.add(new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3)));
-        basket.add(new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2")));
+        Item beans = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
+        basket.add(beans);
+        Item oranges = new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2"));
+        basket.add(oranges);
         receiptBuilder = new ReceiptBuilder(availablePromotions, basket);
+
         Receipt receipt = receiptBuilder.build();
 
-        String receiptPrintOut = receipt.printOut();
-
-        Assert.assertThat(receiptPrintOut, is(PROMOTION_AND_PRICE_DEFINITION_RECEIPT));
+        Assert.assertThat(receipt.getItems(), hasItems(beans, oranges));
+        Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));
+        Assert.assertThat(receipt.getPromotionSavings(), hasEntry(threeForTwoPromotion.getPromotionType(), new BigDecimal("-0.50")));
+        Assert.assertThat(receipt.getSubTotal(), is(equalTo(new BigDecimal("1.90"))));
+        Assert.assertThat(receipt.getTotalSavings(), is(equalTo(new BigDecimal("-0.50"))));
+        Assert.assertThat(receipt.getTotalToPay(), is(equalTo(new BigDecimal("1.40"))));
     }
 }

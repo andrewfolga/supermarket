@@ -4,16 +4,13 @@ import qmetric.supermarket.domain.promotion.Promotion;
 import qmetric.supermarket.domain.promotion.PromotionType;
 
 import java.math.BigDecimal;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static qmetric.supermarket.domain.Unit.ITEM;
 
 /**
  * Created by andrzejfolga on 01/05/2017.
  */
-// TODO: This class has 2 responsibilities: managing amount definition and promotion calculations and printing items -> decouple
 public class Basket {
 
     public static final String TEMPLATE = "%-20s %5.2f\n";
@@ -21,6 +18,30 @@ public class Basket {
     private final Map<ItemType, Item> items = new HashMap<>();
     private final Map<ItemType, Promotion> appliedPromotions = new HashMap<>();
     private final Map<PromotionType, BigDecimal> promotionSavings = new HashMap<>();
+
+    public List<Item> getItems() {
+        return Collections.unmodifiableList(new ArrayList<>(items.values()));
+    }
+
+    public List<Promotion> getPromotions() {
+        return Collections.unmodifiableList(new ArrayList<>(appliedPromotions.values()));
+    }
+
+    public Map<PromotionType, BigDecimal> getSavings() {
+        return Collections.unmodifiableMap(new HashMap<>(promotionSavings));
+    }
+
+    public BigDecimal calculatePromotions(List<Promotion> availablePromotions) {
+        BigDecimal totalToPayForPromotions = BigDecimal.ZERO;
+        for (Promotion promotion : availablePromotions) {
+            Item item = findItemForType(promotion.getItemType());
+            if (item != null) {
+                totalToPayForPromotions = totalToPayForPromotions.add(promotion.apply(item));
+                promotionApplied(promotion, item, totalToPayForPromotions);
+            }
+        }
+        return totalToPayForPromotions;
+    }
 
     public void add(Item item) {
         items.merge(item.getItemType(), item, (a, b) -> new Item(a.getItemType(), a.getPriceDefinition(), a.getQuantity().add(b.getQuantity())));
@@ -31,49 +52,17 @@ public class Basket {
         promotionSavings.put(promotion.getPromotionType(), amountToPay.subtract(item.getQuantity().multiply(item.getPriceDefinition().getAmountPerUnit())));
     }
 
-    public BigDecimal findQuantityForType(ItemType type) {
-        return items.get(type).getQuantity();
-    }
-
     public Item findItemForType(ItemType type) {
         return items.get(type);
-    }
-
-    public String printAllItemsNoPromotions() {
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
-        for (Item item : items.values()) {
-            BigDecimal quantity = item.getQuantity();
-            Unit itemUnit = item.getPriceDefinition().getUnit();
-            BigDecimal itemAmountPerUnit = item.getPriceDefinition().getAmountPerUnit();
-            if (itemUnit == ITEM) {
-                for (int i = 0; i < quantity.intValue(); i++) {
-                    formatter.format(TEMPLATE, item.getItemType().getName(), itemAmountPerUnit);
-                }
-            } else {
-                BigDecimal itemSubTotal = itemAmountPerUnit.multiply(quantity);
-                formatter.format(TEMPLATE,
-                        String.format(itemUnit.getDisplayFormat(), item.getItemType().getName(), quantity, itemAmountPerUnit),
-                        itemSubTotal);
-            }
-        }
-        return sb.toString();
-    }
-
-    public String printSavings() {
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
-        for (Promotion promotion : appliedPromotions.values()) {
-            formatter.format(TEMPLATE, promotion.getDescription(), promotionSavings.get(promotion.getPromotionType()));
-        }
-        return sb.toString();
     }
 
 
     public BigDecimal calculateSubTotal() {
         BigDecimal subTotal = BigDecimal.ZERO;
         for (Item item : items.values()) {
-            subTotal = subTotal.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+            BigDecimal amountPerUnit = item.getPriceDefinition().getAmountPerUnit();
+            BigDecimal quantity = item.getQuantity();
+            subTotal = subTotal.add(amountPerUnit.multiply(quantity)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
         }
         return subTotal;
     }
@@ -91,5 +80,4 @@ public class Basket {
     private boolean hasNoPromotion(Item item) {
         return !appliedPromotions.containsKey(item.getItemType());
     }
-
 }

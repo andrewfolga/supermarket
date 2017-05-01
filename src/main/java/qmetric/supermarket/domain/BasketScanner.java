@@ -1,7 +1,7 @@
 package qmetric.supermarket.domain;
 
 import qmetric.supermarket.domain.promotion.Promotion;
-import qmetric.supermarket.ports.PromitionRepositoryPort;
+import qmetric.supermarket.ports.primary.PromitionRepositoryPort;
 
 import java.util.List;
 
