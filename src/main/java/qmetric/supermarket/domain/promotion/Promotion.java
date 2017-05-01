@@ -11,6 +11,8 @@ import java.util.Optional;
  */
 public abstract class Promotion {
 
+    protected static final String FORMAT_PROMOTION_DISPLAY = "%-20s";
+
     protected final Optional<BigDecimal> triggerQuantity;
     protected final Optional<BigDecimal> targetQuantity;
     protected final Optional<BigDecimal> triggerPrice;
@@ -29,30 +31,35 @@ public abstract class Promotion {
         return itemType;
     }
 
-    public abstract PromotionType getPromotionType();
+    public String getDescription() {
+        return String.format(FORMAT_PROMOTION_DISPLAY, getItemType().getName()+ " " + getPromotionType().getDisplayFormat());
+    }
 
     public BigDecimal apply(Item item) {
-        BigDecimal price = item.getPrice().multiply(item.getQuantity()).setScale(2);
+        BigDecimal price = item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity()).setScale(2);
         BigDecimal itemQuantity = item.getQuantity();
-        if (!triggerQuantity.isPresent() || itemQuantity.compareTo(triggerQuantity.get()) > 0) {
+        if (!triggerQuantity.isPresent() || itemQuantity.compareTo(triggerQuantity.get()) >= 0) {
+            int itemQuantityValue = itemQuantity.intValue();
             BigDecimal applyTimes = triggerQuantity.isPresent() ?
-                    new BigDecimal(itemQuantity.intValue() / triggerQuantity.get().intValue()) : BigDecimal.ONE;
+                    new BigDecimal(itemQuantityValue / triggerQuantity.get().intValue()) : BigDecimal.ONE;
             BigDecimal applyReminder = triggerQuantity.isPresent() ?
-                    new BigDecimal(itemQuantity.intValue() % triggerQuantity.get().intValue()) : BigDecimal.ZERO;
+                    new BigDecimal(itemQuantityValue % triggerQuantity.get().intValue()) : BigDecimal.ZERO;
 
             price = getPromotionPrice(item).multiply(getPromotionQuantity(item)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
 
             price = price.multiply(applyTimes);
-            price = price.add(item.getPrice().multiply(applyReminder));
+            price = price.add(item.getPriceDefinition().getAmountPerUnit().multiply(applyReminder));
         }
         return price;
     }
 
     private BigDecimal getPromotionPrice(Item item) {
-        return targetPrice.orElseGet(() -> item.getPrice());
+        return targetPrice.orElseGet(() -> item.getPriceDefinition().getAmountPerUnit());
     }
 
     public BigDecimal getPromotionQuantity(Item item) {
         return targetQuantity.orElseGet(() -> item.getQuantity());
     }
+
+    public abstract PromotionType getPromotionType();
 }
