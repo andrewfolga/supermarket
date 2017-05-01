@@ -14,18 +14,23 @@ public class ReceiptBuilder {
     private final Basket basket;
 
     public ReceiptBuilder(List<Promotion> availablePromotions, Basket basket) {
-
         this.availablePromotions = availablePromotions;
         this.basket = basket;
     }
 
     public Receipt build() {
-        BigDecimal overallPrice = BigDecimal.ZERO;
+        BigDecimal totalToPay = BigDecimal.ZERO;
+        BigDecimal subTotal = basket.calculateSubTotal();
         for (Promotion promotion : availablePromotions) {
             Item item = basket.findItemForType(promotion.getItemType());
-            overallPrice = overallPrice.add(promotion.apply(item));
+            if (item != null) {
+                totalToPay = totalToPay.add(promotion.apply(item));
+                basket.promotionApplied(promotion, item, totalToPay);
+            }
         }
-        return new Receipt(basket, overallPrice);
+        BigDecimal afterPromotionsSubTotal = basket.calculateRemainder();
+        totalToPay = totalToPay.add(afterPromotionsSubTotal);
+        return new Receipt(basket, subTotal, totalToPay);
     }
 
 }
