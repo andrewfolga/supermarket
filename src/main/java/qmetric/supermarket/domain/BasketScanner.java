@@ -17,8 +17,7 @@ public class BasketScanner {
     }
 
     public Receipt scan(Basket basket) {
-        List<Promotion> availablePromotions = promitionRepositoryPort.findPromotions(basket);
-        ReceiptBuilder receiptBuilder = new ReceiptBuilder(availablePromotions, basket);
+        ReceiptBuilder receiptBuilder = new ReceiptBuilder(basket);
         return receiptBuilder.build();
     }
 }

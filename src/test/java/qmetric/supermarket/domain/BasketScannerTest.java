@@ -41,12 +41,10 @@ public class BasketScannerTest {
 
     @Test
     public void shouldApplyThreeForTwoPromotion() throws Exception {
-        Basket basket = new Basket();
+        Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
         basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(3)));
         basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(3)));
         basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, BigDecimal.ONE));
-        List<Promotion> promotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
-        Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
         Receipt receipt = basketScanner.scan(basket);
 
@@ -55,10 +53,8 @@ public class BasketScannerTest {
 
     @Test
     public void shouldNotApplyThreeForTwoPromotionIfNoQuantity() throws Exception {
-        Basket basket = new Basket();
+        Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
         basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(2)));
-        List<Promotion> promotions = Arrays.asList(new ThreeForTwoPromotion(BEANS));
-        Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
         Receipt receipt = basketScanner.scan(basket);
 
@@ -67,12 +63,10 @@ public class BasketScannerTest {
 
     @Test
     public void shouldApplyTwoForPricePromotion() throws Exception {
-        Basket basket = new Basket();
+        Basket basket = new Basket(Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0"))));
         basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, new BigDecimal(2)));
         basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, new BigDecimal(2)));
         basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, BigDecimal.ONE));
-        List<Promotion> promotions = Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0")));
-        Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
         Receipt receipt = basketScanner.scan(basket);
 
@@ -81,10 +75,8 @@ public class BasketScannerTest {
 
     @Test
     public void shouldNotApplyTwoForPricePromotionIfNoQuantity() throws Exception {
-        Basket basket = new Basket();
+        Basket basket = new Basket(Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0"))));
         basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, BigDecimal.ONE));
-        List<Promotion> promotions = Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0")));
-        Mockito.when(promitionRepositoryPort.findPromotions(basket)).thenReturn(promotions);
 
         Receipt receipt = basketScanner.scan(basket);
 
@@ -93,7 +85,7 @@ public class BasketScannerTest {
 
     @Test
     public void shouldApplyWeightForPriceDefinition() throws Exception {
-        Basket basket = new Basket();
+        Basket basket = new Basket(Arrays.asList());
         basket.add(new Item(ORANGES, POUND_NINETY_NINE_PENCE_PER_KG, new BigDecimal("0.20")));
 
         Receipt receipt = basketScanner.scan(basket);

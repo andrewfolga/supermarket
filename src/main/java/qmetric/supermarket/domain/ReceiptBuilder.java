@@ -10,16 +10,14 @@ import java.util.List;
  */
 public class ReceiptBuilder {
 
-    private final List<Promotion> availablePromotions;
     private final Basket basket;
 
-    public ReceiptBuilder(List<Promotion> availablePromotions, Basket basket) {
-        this.availablePromotions = availablePromotions;
+    public ReceiptBuilder(Basket basket) {
         this.basket = basket;
     }
 
     public Receipt build() {
-        BigDecimal totalToPay = basket.calculatePromotions(availablePromotions);
+        BigDecimal totalToPay = basket.calculatePromotions();
         BigDecimal afterPromotionsSubTotal = basket.calculateRemainder();
         totalToPay = totalToPay.add(afterPromotionsSubTotal);
         BigDecimal subTotal = basket.calculateSubTotal();

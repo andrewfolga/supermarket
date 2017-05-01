@@ -16,8 +16,13 @@ public class Basket {
     public static final String TEMPLATE = "%-20s %5.2f\n";
 
     private final Map<ItemType, Item> items = new HashMap<>();
+    private final List<Promotion> promotions;
     private final Map<ItemType, Promotion> appliedPromotions = new HashMap<>();
     private final Map<PromotionType, BigDecimal> promotionSavings = new HashMap<>();
+
+    public Basket(List<Promotion> promotions) {
+        this.promotions = promotions;
+    }
 
     public List<Item> getItems() {
         return Collections.unmodifiableList(new ArrayList<>(items.values()));
@@ -31,9 +36,9 @@ public class Basket {
         return Collections.unmodifiableMap(new HashMap<>(promotionSavings));
     }
 
-    public BigDecimal calculatePromotions(List<Promotion> availablePromotions) {
+    public BigDecimal calculatePromotions() {
         BigDecimal totalToPayForPromotions = BigDecimal.ZERO;
-        for (Promotion promotion : availablePromotions) {
+        for (Promotion promotion : promotions) {
             Item item = findItemForType(promotion.getItemType());
             if (item != null) {
                 totalToPayForPromotions = totalToPayForPromotions.add(promotion.apply(item));
