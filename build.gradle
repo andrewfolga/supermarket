@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     testCompile ('junit:junit:4.12') {
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
