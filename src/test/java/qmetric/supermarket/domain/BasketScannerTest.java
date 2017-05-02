@@ -26,15 +26,10 @@ import static qmetric.supermarket.domain.ItemType.*;
 @RunWith(MockitoJUnitRunner.class)
 public class BasketScannerTest {
 
-    public static final PriceDefinition HALF_POUND_PER_ITEM = new PriceDefinition(new BigDecimal("0.50"), Unit.ITEM);
-    public static final PriceDefinition SEVENTY_PENCE_PER_ITEM = new PriceDefinition(new BigDecimal("0.70"), Unit.ITEM);
-    public static final PriceDefinition POUND_NINETY_NINE_PENCE_PER_KG = new PriceDefinition(new BigDecimal("1.99"), Unit.KG);
     @Mock
     private Basket basket;
     @Mock
     private Receipt receipt;
-    @Mock
-    private PromitionRepositoryPort promitionRepositoryPort;
     @Mock
     private ReceiptBuilder receiptBuilder;
     @InjectMocks
@@ -42,9 +37,8 @@ public class BasketScannerTest {
 
     @Before
     public void setUp() throws Exception {
-        basketScanner = new BasketScanner(promitionRepositoryPort, receiptBuilder);
+        basketScanner = new BasketScanner(receiptBuilder);
     }
-
 
     @Test
     public void shouldScan() throws Exception {
@@ -55,57 +49,4 @@ public class BasketScannerTest {
         Assert.assertThat(receipt, is(equalTo(receipt)));
     }
 
-/*    @Test
-    public void shouldApplyThreeForTwoPromotion() throws Exception {
-        Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
-        basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(3)));
-        basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(3)));
-        basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, BigDecimal.ONE));
-
-        Receipt receipt = basketScanner.scan(basket);
-
-        assertThat(receipt.getTotalToPay(), is(new BigDecimal("2.50")));
-    }
-
-    @Test
-    public void shouldNotApplyThreeForTwoPromotionIfNoQuantity() throws Exception {
-        Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
-        basket.add(new Item(BEANS, HALF_POUND_PER_ITEM, new BigDecimal(2)));
-
-        Receipt receipt = basketScanner.scan(basket);
-
-        assertThat(receipt.getTotalToPay(), is(new BigDecimal("1.00")));
-    }
-
-    @Test
-    public void shouldApplyTwoForPricePromotion() throws Exception {
-        Basket basket = new Basket(Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0"))));
-        basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, new BigDecimal(2)));
-        basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, new BigDecimal(2)));
-        basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, BigDecimal.ONE));
-
-        Receipt receipt = basketScanner.scan(basket);
-
-        assertThat(receipt.getTotalToPay(), is(new BigDecimal("2.70")));
-    }
-
-    @Test
-    public void shouldNotApplyTwoForPricePromotionIfNoQuantity() throws Exception {
-        Basket basket = new Basket(Arrays.asList(new TwoForPricePromotion(COKE, new BigDecimal("1.0"))));
-        basket.add(new Item(COKE, SEVENTY_PENCE_PER_ITEM, BigDecimal.ONE));
-
-        Receipt receipt = basketScanner.scan(basket);
-
-        assertThat(receipt.getTotalToPay(), is(new BigDecimal("0.70")));
-    }
-
-    @Test
-    public void shouldApplyWeightForPriceDefinition() throws Exception {
-        Basket basket = new Basket(Arrays.asList());
-        basket.add(new Item(ORANGES, POUND_NINETY_NINE_PENCE_PER_KG, new BigDecimal("0.20")));
-
-        Receipt receipt = basketScanner.scan(basket);
-
-        assertThat(receipt.getTotalToPay(), is(new BigDecimal("0.40")));
-    }*/
 }

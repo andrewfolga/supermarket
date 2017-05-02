@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class Basket {
 
-    private final Map<ItemType, Item> items = new HashMap<>();
+    private final SortedMap<ItemType, Item> items = new TreeMap<>();
     private final List<Promotion> allPromotions;
     private final List<Promotion> appliedPromotions = new ArrayList<>();
     private final Map<PromotionType, BigDecimal> promotionSavings = new HashMap<>();
@@ -33,44 +33,39 @@ public class Basket {
     }
 
     public BigDecimal calculatePromotions() {
-        BigDecimal totalToPayForPromotions = BigDecimal.ZERO;
+        BigDecimal totalToPay = BigDecimal.ZERO;
         for (Promotion promotion : allPromotions) {
-            Item item = findItemForType(promotion.getItemType());
+            Item item = items.get(promotion.getItemType());
             if (item != null) {
-                totalToPayForPromotions = totalToPayForPromotions.add(promotion.apply(item));
+                totalToPay = totalToPay.add(promotion.apply(item));
                 appliedPromotions.add(promotion);
-                promotionSavings.put(promotion.getPromotionType(), totalToPayForPromotions.subtract(item.getQuantity().multiply(item.getPriceDefinition().getAmountPerUnit())));
+                promotionSavings.put(promotion.getPromotionType(), totalToPay.subtract(item.getQuantityPerUnit().multiply(item.getPriceDefinition().getAmountPerUnit())));
             }
         }
-        return totalToPayForPromotions;
+        return totalToPay;
     }
 
     public void add(Item item) {
-        items.merge(item.getItemType(), item, (a, b) -> new Item(a.getItemType(), a.getPriceDefinition(), a.getQuantity().add(b.getQuantity())));
+        items.merge(item.getItemType(), item, (a, b) -> new Item(a.getItemType(), a.getPriceDefinition(), a.getQuantityPerUnit().add(b.getQuantityPerUnit())));
 
     }
-
-    public Item findItemForType(ItemType type) {
-        return items.get(type);
-    }
-
 
     public BigDecimal calculateSubTotal() {
         BigDecimal subTotal = BigDecimal.ZERO;
         for (Item item : items.values()) {
             BigDecimal amountPerUnit = item.getPriceDefinition().getAmountPerUnit();
-            BigDecimal quantity = item.getQuantity();
+            BigDecimal quantity = item.getQuantityPerUnit();
             subTotal = subTotal.add(amountPerUnit.multiply(quantity)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
         }
         return subTotal;
     }
 
-    public BigDecimal calculateRemainder() {
+    public BigDecimal calculateNonPromotions() {
         BigDecimal totalAfterPromotions = BigDecimal.ZERO;
         for (Item item : items.values()) {
             boolean wasPromotionApplied = appliedPromotions.stream().filter(e -> e.getItemType().equals(item.getItemType())).findFirst().isPresent();
             if (!wasPromotionApplied) {
-                totalAfterPromotions = totalAfterPromotions.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity())).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                totalAfterPromotions = totalAfterPromotions.add(item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantityPerUnit())).setScale(2, BigDecimal.ROUND_HALF_EVEN);
             }
         }
         return totalAfterPromotions;

@@ -14,7 +14,7 @@ public class ThreeForTwoPromotion extends Promotion {
     private static final BigDecimal TARGET_QUANTITY = new BigDecimal(2);
 
     public ThreeForTwoPromotion(ItemType itemType) {
-        super(Optional.of(TRIGGER_QUANTITY), Optional.of(TARGET_QUANTITY), Optional.empty(), Optional.empty(), itemType);
+        super(TRIGGER_QUANTITY, Optional.of(TARGET_QUANTITY), Optional.empty(), itemType);
     }
 
     @Override

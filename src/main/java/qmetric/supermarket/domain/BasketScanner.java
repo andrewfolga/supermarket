@@ -7,11 +7,9 @@ import qmetric.supermarket.ports.primary.PromitionRepositoryPort;
  */
 public class BasketScanner {
 
-    private PromitionRepositoryPort promitionRepositoryPort;
     private ReceiptBuilder receiptBuilder;
 
-    public BasketScanner(PromitionRepositoryPort promitionRepositoryPort, ReceiptBuilder receiptBuilder) {
-        this.promitionRepositoryPort = promitionRepositoryPort;
+    public BasketScanner(ReceiptBuilder receiptBuilder) {
         this.receiptBuilder = receiptBuilder;
     }
 

@@ -8,12 +8,12 @@ import java.math.BigDecimal;
 public class Item {
     private final ItemType itemType;
     private final PriceDefinition priceDefinition;
-    private final BigDecimal quantity;
+    private final BigDecimal quantityPerUnit;
 
-    public Item(ItemType itemType, PriceDefinition priceDefinition, BigDecimal quantity) {
+    public Item(ItemType itemType, PriceDefinition priceDefinition, BigDecimal quantityPerUnit) {
         this.itemType = itemType;
         this.priceDefinition = priceDefinition;
-        this.quantity = quantity;
+        this.quantityPerUnit = quantityPerUnit;
     }
 
     public ItemType getItemType() {
@@ -24,7 +24,7 @@ public class Item {
         return priceDefinition;
     }
 
-    public BigDecimal getQuantity() {
-        return quantity;
+    public BigDecimal getQuantityPerUnit() {
+        return quantityPerUnit;
     }
 }

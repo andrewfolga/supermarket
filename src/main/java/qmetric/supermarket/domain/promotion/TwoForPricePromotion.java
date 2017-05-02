@@ -14,7 +14,7 @@ public class TwoForPricePromotion extends Promotion {
     private static final BigDecimal TARGET_QUANTITY = new BigDecimal(1);
 
     public TwoForPricePromotion(ItemType itemType, BigDecimal price) {
-        super(Optional.of(TRIGGER_QUANTITY), Optional.of(TARGET_QUANTITY), Optional.empty(), Optional.of(price), itemType);
+        super(TRIGGER_QUANTITY, Optional.of(TARGET_QUANTITY), Optional.of(price), itemType);
     }
 
     @Override

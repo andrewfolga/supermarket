@@ -1,9 +1,11 @@
 package qmetric.supermarket.domain.promotion;
 
+import org.apache.commons.lang3.Validate;
 import qmetric.supermarket.domain.Item;
 import qmetric.supermarket.domain.ItemType;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Optional;
 
 /**
@@ -13,16 +15,15 @@ public abstract class Promotion {
 
     protected static final String FORMAT_PROMOTION_DISPLAY = "%-20s";
 
-    protected final Optional<BigDecimal> triggerQuantity;
+    protected final BigDecimal triggerQuantity;
     protected final Optional<BigDecimal> targetQuantity;
-    protected final Optional<BigDecimal> triggerPrice;
     protected final Optional<BigDecimal> targetPrice;
     private final ItemType itemType;
 
-    public Promotion(Optional<BigDecimal> triggerQuantity, Optional<BigDecimal> targetQuantity, Optional<BigDecimal> triggerPrice, Optional<BigDecimal> targetPrice, ItemType itemType) {
+    public Promotion(BigDecimal triggerQuantity, Optional<BigDecimal> targetQuantity, Optional<BigDecimal> targetPrice, ItemType itemType) {
+        Validate.notNull(triggerQuantity, "Trigger quantity must be provided");
         this.triggerQuantity = triggerQuantity;
         this.targetQuantity = targetQuantity;
-        this.triggerPrice = triggerPrice;
         this.targetPrice = targetPrice;
         this.itemType = itemType;
     }
@@ -36,21 +37,18 @@ public abstract class Promotion {
     }
 
     public BigDecimal apply(Item item) {
-        BigDecimal price = item.getPriceDefinition().getAmountPerUnit().multiply(item.getQuantity()).setScale(2);
-        BigDecimal itemQuantity = item.getQuantity();
-        if (!triggerQuantity.isPresent() || itemQuantity.compareTo(triggerQuantity.get()) >= 0) {
-            int itemQuantityValue = itemQuantity.intValue();
-            BigDecimal applyTimes = triggerQuantity.isPresent() ?
-                    new BigDecimal(itemQuantityValue / triggerQuantity.get().intValue()) : BigDecimal.ONE;
-            BigDecimal applyReminder = triggerQuantity.isPresent() ?
-                    new BigDecimal(itemQuantityValue % triggerQuantity.get().intValue()) : BigDecimal.ZERO;
+        BigDecimal priceToPay = BigDecimal.ZERO;
+        BigDecimal itemQuantity = item.getQuantityPerUnit();
+        if (item.getItemType().equals(itemType) && itemQuantity.compareTo(triggerQuantity) >= 0) {
+            BigDecimal applyTimes = itemQuantity.divide(triggerQuantity, 0, BigDecimal.ROUND_DOWN);
+            BigDecimal applyReminder = itemQuantity.remainder(triggerQuantity);
 
-            price = getPromotionPrice(item).multiply(getPromotionQuantity(item)).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+            priceToPay = getPromotionPrice(item).multiply(getPromotionQuantity(item));
 
-            price = price.multiply(applyTimes);
-            price = price.add(item.getPriceDefinition().getAmountPerUnit().multiply(applyReminder));
+            priceToPay = priceToPay.multiply(applyTimes);
+            priceToPay = priceToPay.add(item.getPriceDefinition().getAmountPerUnit().multiply(applyReminder));
         }
-        return price;
+        return priceToPay.setScale(2, BigDecimal.ROUND_HALF_EVEN);
     }
 
     private BigDecimal getPromotionPrice(Item item) {
@@ -58,7 +56,7 @@ public abstract class Promotion {
     }
 
     public BigDecimal getPromotionQuantity(Item item) {
-        return targetQuantity.orElseGet(() -> item.getQuantity());
+        return targetQuantity.orElseGet(() -> BigDecimal.ONE);
     }
 
     public abstract PromotionType getPromotionType();

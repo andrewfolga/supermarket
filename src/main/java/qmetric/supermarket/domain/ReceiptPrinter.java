@@ -14,30 +14,24 @@ public class ReceiptPrinter {
 
     public static final String TEMPLATE = "%-20s %5.2f\n";
 
-    private final Receipt receipt;
-
-    public ReceiptPrinter(Receipt receipt) {
-        this.receipt = receipt;
-    }
-
-    public String print() {
+    public String print(Receipt receipt) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
-        sb.append(printSubTotal());
+        sb.append(printSubTotal(receipt));
         formatter.format(TEMPLATE, "Sub-total", receipt.getSubTotal());
         sb.append("Savings\n");
-        sb.append(printSavings());
+        sb.append(printSavings(receipt));
         formatter.format(TEMPLATE, "Total savings", receipt.getTotalSavings());
         sb.append("--------------------------\n");
         formatter.format(TEMPLATE, "Total to Pay", receipt.getTotalToPay());
         return sb.toString();
     }
 
-    private String printSubTotal() {
+    private String printSubTotal(Receipt receipt) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
         for (Item item : receipt.getItems()) {
-            BigDecimal quantity = item.getQuantity();
+            BigDecimal quantity = item.getQuantityPerUnit();
             Unit itemUnit = item.getPriceDefinition().getUnit();
             BigDecimal itemAmountPerUnit = item.getPriceDefinition().getAmountPerUnit();
             if (itemUnit == ITEM) {
@@ -54,7 +48,7 @@ public class ReceiptPrinter {
         return sb.toString();
     }
 
-    private String printSavings() {
+    private String printSavings(Receipt receipt) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
         for (Promotion promotion : receipt.getPromotions()) {
