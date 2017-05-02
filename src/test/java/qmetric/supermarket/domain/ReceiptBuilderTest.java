@@ -26,11 +26,11 @@ public class ReceiptBuilderTest {
 
     @Test
     public void shouldBuildBasicReceipt() throws Exception {
-        Basket basket = new Basket(Arrays.asList());
+        Basket basket = new Basket();
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
 
-        Receipt receipt = receiptBuilder.build(basket);
+        Receipt receipt = receiptBuilder.build(basket, Arrays.asList());
 
         Assert.assertThat(receipt.getItems(), hasItems(item));
         Assert.assertThat(receipt.getPromotions(), empty());
@@ -44,11 +44,11 @@ public class ReceiptBuilderTest {
     public void shouldBuildReceiptWithPromotions() throws Exception {
         ThreeForTwoPromotion threeForTwoPromotion = new ThreeForTwoPromotion(BEANS);
         List<Promotion> availablePromotions = Arrays.asList(threeForTwoPromotion);
-        Basket basket = new Basket(availablePromotions);
+        Basket basket = new Basket();
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
 
-        Receipt receipt = receiptBuilder.build(basket);
+        Receipt receipt = receiptBuilder.build(basket, availablePromotions);
 
         Assert.assertThat(receipt.getItems(), hasItems(item));
         Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));
@@ -62,13 +62,13 @@ public class ReceiptBuilderTest {
     public void shouldBuildReceiptWithPromotionsAndPriceDefinitions() throws Exception {
         ThreeForTwoPromotion threeForTwoPromotion = new ThreeForTwoPromotion(BEANS);
         List<Promotion> availablePromotions = Arrays.asList(threeForTwoPromotion);
-        Basket basket = new Basket(availablePromotions);
+        Basket basket = new Basket();
         Item beans = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(beans);
         Item oranges = new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2"));
         basket.add(oranges);
 
-        Receipt receipt = receiptBuilder.build(basket);
+        Receipt receipt = receiptBuilder.build(basket, availablePromotions);
 
         Assert.assertThat(receipt.getItems(), hasItems(beans, oranges));
         Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));

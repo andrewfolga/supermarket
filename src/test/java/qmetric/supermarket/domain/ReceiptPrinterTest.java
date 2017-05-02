@@ -2,6 +2,8 @@ package qmetric.supermarket.domain;
 
 import org.junit.Assert;
 import org.junit.Test;
+import qmetric.supermarket.domain.ReceiptPrinter;
+import qmetric.supermarket.domain.*;
 import qmetric.supermarket.domain.promotion.ThreeForTwoPromotion;
 
 import java.math.BigDecimal;
@@ -16,7 +18,7 @@ import static qmetric.supermarket.domain.ItemType.ORANGES;
  */
 public class ReceiptPrinterTest {
 
-    private ReceiptPrinter receiptPrinter = new ReceiptPrinter();
+    private ReceiptPrinter receiptPrinterAdapter = new ReceiptPrinter();
 
     private static final String BASIC_RECEIPT =
             "Beans                 0.50\n" +
@@ -54,24 +56,24 @@ public class ReceiptPrinterTest {
 
     @Test
     public void shouldBuildBasicReceipt() throws Exception {
-        Basket basket = new Basket(Arrays.asList());
+        Basket basket = new Basket();
         basket.add(new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3)));
         Receipt receipt = new Receipt(basket, new ReceiptSummary(new BigDecimal("1.5"), new BigDecimal("1.5")));
 
-        String receiptPrintout = receiptPrinter.print(receipt);
+        String receiptPrintout = receiptPrinterAdapter.print(receipt);
 
         Assert.assertThat(receiptPrintout, is(BASIC_RECEIPT));
     }
 
     @Test
     public void shouldBuildReceiptWithPromotions() throws Exception {
-        Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
+        Basket basket = new Basket();
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
-        basket.calculatePromotions();
+        basket.calculatePromotions(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
         Receipt receipt = new Receipt(basket, new ReceiptSummary(new BigDecimal("1.5"), new BigDecimal("1.0")));
 
-        String receiptPrintout = receiptPrinter.print(receipt);
+        String receiptPrintout = receiptPrinterAdapter.print(receipt);
 
         Assert.assertThat(receiptPrintout, is(PROMOTION_RECEIPT));
     }
@@ -80,15 +82,15 @@ public class ReceiptPrinterTest {
     public void shouldBuildReceiptWithPromotionsAndPriceDefinitions() throws Exception {
 
         ThreeForTwoPromotion threeForTwoPromotion = new ThreeForTwoPromotion(BEANS);
-        Basket basket = new Basket(Arrays.asList(threeForTwoPromotion));
+        Basket basket = new Basket();
         Item beans = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(beans);
         Item oranges = new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2"));
         basket.add(oranges);
-        basket.calculatePromotions();
+        basket.calculatePromotions(Arrays.asList(threeForTwoPromotion));
         Receipt receipt = new Receipt(basket, new ReceiptSummary(new BigDecimal("1.90"), new BigDecimal("1.40")));
 
-        String receiptPrintout = receiptPrinter.print(receipt);
+        String receiptPrintout = receiptPrinterAdapter.print(receipt);
 
         Assert.assertThat(receiptPrintout, is(PROMOTION_AND_KG_PRICE_DEFINITION_RECEIPT));
     }

@@ -8,7 +8,7 @@ import java.util.Formatter;
 import static qmetric.supermarket.domain.Unit.ITEM;
 
 /**
- * Created by andrzejfolga on 01/05/2017.
+ * Created by andrzejfolga on 02/05/2017.
  */
 public class ReceiptPrinter {
 

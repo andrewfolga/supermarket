@@ -11,10 +11,9 @@ import java.util.Optional;
 public class TwoForPricePromotion extends Promotion {
 
     private static final BigDecimal TRIGGER_QUANTITY = new BigDecimal(2);
-    private static final BigDecimal TARGET_QUANTITY = new BigDecimal(1);
 
     public TwoForPricePromotion(ItemType itemType, BigDecimal price) {
-        super(TRIGGER_QUANTITY, Optional.of(TARGET_QUANTITY), Optional.of(price), itemType);
+        super(TRIGGER_QUANTITY, Optional.empty(), Optional.of(price), itemType);
     }
 
     @Override

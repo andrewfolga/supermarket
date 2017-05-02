@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by andrzejfolga on 01/05/2017.
  */
-public interface PromitionRepositoryPort {
+public interface PromotionRepositoryPort {
 
     Collection<Promotion> getPromotions();
 

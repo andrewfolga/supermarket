@@ -12,13 +12,8 @@ import java.util.*;
 public class Basket {
 
     private final SortedMap<ItemType, Item> items = new TreeMap<>();
-    private final List<Promotion> allPromotions;
     private final List<Promotion> appliedPromotions = new ArrayList<>();
     private final Map<PromotionType, BigDecimal> promotionSavings = new HashMap<>();
-
-    public Basket(List<Promotion> allPromotions) {
-        this.allPromotions = allPromotions;
-    }
 
     public List<Item> getItems() {
         return Collections.unmodifiableList(new ArrayList<>(items.values()));
@@ -32,15 +27,13 @@ public class Basket {
         return Collections.unmodifiableMap(new HashMap<>(promotionSavings));
     }
 
-    public BigDecimal calculatePromotions() {
+    public BigDecimal calculatePromotions(List<Promotion> promotions) {
         BigDecimal totalToPay = BigDecimal.ZERO;
-        for (Promotion promotion : allPromotions) {
+        for (Promotion promotion : promotions) {
             Item item = items.get(promotion.getItemType());
-            if (item != null) {
-                totalToPay = totalToPay.add(promotion.apply(item));
-                appliedPromotions.add(promotion);
-                promotionSavings.put(promotion.getPromotionType(), totalToPay.subtract(item.getQuantityPerUnit().multiply(item.getPriceDefinition().getAmountPerUnit())));
-            }
+            totalToPay = totalToPay.add(promotion.apply(item));
+            appliedPromotions.add(promotion);
+            promotionSavings.put(promotion.getPromotionType(), totalToPay.subtract(item.getQuantityPerUnit().multiply(item.getPriceDefinition().getAmountPerUnit())));
         }
         return totalToPay;
     }

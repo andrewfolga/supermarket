@@ -22,8 +22,8 @@ public abstract class Promotion {
 
     public Promotion(BigDecimal triggerQuantity, Optional<BigDecimal> targetQuantity, Optional<BigDecimal> targetPrice, ItemType itemType) {
         Validate.notNull(triggerQuantity, "Trigger quantity must be provided");
-        Validate.isTrue(targetQuantity.isPresent() || targetPrice.isPresent(), "Target quantity or target price must be provided");
-        Validate.isTrue(triggerQuantity.compareTo(targetQuantity.get())<0, "Trigger quantity must greater than target quantity");
+        Validate.validState(targetQuantity.isPresent() || targetPrice.isPresent(), "Either target quantity or target price must be provided");
+        Validate.validState(targetPrice.isPresent() || triggerQuantity.compareTo(targetQuantity.get()) > 0, "Trigger quantity must be greater than target quantity");
         this.triggerQuantity = triggerQuantity;
         this.targetQuantity = targetQuantity;
         this.targetPrice = targetPrice;
@@ -35,7 +35,7 @@ public abstract class Promotion {
     }
 
     public String getDescription() {
-        return String.format(FORMAT_PROMOTION_DISPLAY, getItemType().getName()+ " " + getPromotionType().getDisplayFormat());
+        return String.format(FORMAT_PROMOTION_DISPLAY, getItemType().getName() + " " + getPromotionType().getDisplayFormat());
     }
 
     public BigDecimal apply(Item item) {

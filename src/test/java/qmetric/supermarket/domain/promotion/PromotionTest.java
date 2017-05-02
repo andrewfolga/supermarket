@@ -28,11 +28,18 @@ public class PromotionTest {
     private static final Optional<BigDecimal> TARGET_PRICE_1 = Optional.of(new BigDecimal("1.0"));
 
     @Test(expected = NullPointerException.class)
-    public void shouldNotApply3For2PromotionIfTriggerQuantityNotProvided() throws Exception {
-        Promotion promotion = buildPromotion(null, TARGET_QUANTITY_2, TARGET_PRICE_EMPTY, ItemType.BEANS);
-        Item item = new Item(ItemType.COKE, new PriceDefinition(new BigDecimal("2.00"), Unit.ITEM), new BigDecimal("5.00"));
+    public void shouldNotApplyPromotionIfTriggerQuantityNotProvided() throws Exception {
+        buildPromotion(null, TARGET_QUANTITY_2, TARGET_PRICE_EMPTY, ItemType.BEANS);
+    }
 
-        promotion.apply(item);
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotApplyPromotionIfTargetQuantityLowerThanTriggerQuantity() throws Exception {
+        buildPromotion(TRIGGER_QUANTITY_3, TARGET_QUANTITY_3, TARGET_PRICE_EMPTY, ItemType.BEANS);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotApplyPromotionIfTriggerQuantityProvidedAndNeitherTargetQuantityNorTargetPrice() throws Exception {
+        buildPromotion(TRIGGER_QUANTITY_3, TARGET_QUANTITY_EMPTY, TARGET_PRICE_EMPTY, ItemType.BEANS);
     }
 
     @Test
