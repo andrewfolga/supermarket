@@ -22,7 +22,7 @@ import static qmetric.supermarket.domain.ItemType.ORANGES;
 public class ReceiptBuilderTest {
 
     public static final BigDecimal ZERO_AMOUNT = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_EVEN);
-    private ReceiptBuilder receiptBuilder;
+    private ReceiptBuilder receiptBuilder = new ReceiptBuilder();;
 
     @Test
     public void shouldBuildBasicReceipt() throws Exception {
@@ -30,8 +30,7 @@ public class ReceiptBuilderTest {
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
 
-        receiptBuilder = new ReceiptBuilder(basket);
-        Receipt receipt = receiptBuilder.build();
+        Receipt receipt = receiptBuilder.build(basket);
 
         Assert.assertThat(receipt.getItems(), hasItems(item));
         Assert.assertThat(receipt.getPromotions(), empty());
@@ -48,9 +47,8 @@ public class ReceiptBuilderTest {
         Basket basket = new Basket(availablePromotions);
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
-        receiptBuilder = new ReceiptBuilder(basket);
 
-        Receipt receipt = receiptBuilder.build();
+        Receipt receipt = receiptBuilder.build(basket);
 
         Assert.assertThat(receipt.getItems(), hasItems(item));
         Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));
@@ -69,9 +67,8 @@ public class ReceiptBuilderTest {
         basket.add(beans);
         Item oranges = new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2"));
         basket.add(oranges);
-        receiptBuilder = new ReceiptBuilder(basket);
 
-        Receipt receipt = receiptBuilder.build();
+        Receipt receipt = receiptBuilder.build(basket);
 
         Assert.assertThat(receipt.getItems(), hasItems(beans, oranges));
         Assert.assertThat(receipt.getPromotions(), hasItems(threeForTwoPromotion));

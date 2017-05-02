@@ -68,7 +68,7 @@ public class ReceiptPrinterTest {
         Basket basket = new Basket(Arrays.asList(new ThreeForTwoPromotion(BEANS)));
         Item item = new Item(BEANS, new PriceDefinition(new BigDecimal("0.5"), Unit.ITEM), new BigDecimal(3));
         basket.add(item);
-        basket.promotionApplied(new ThreeForTwoPromotion(BEANS), item, new BigDecimal("1.00"));
+//        basket.promotionApplied(new ThreeForTwoPromotion(BEANS), item, new BigDecimal("1.00"));
         Receipt receipt = new Receipt(basket, new ReceiptSummary(new BigDecimal("1.5"), new BigDecimal("1.0")));
 
         String receiptPrintout = new ReceiptPrinter(receipt).print();
@@ -85,7 +85,7 @@ public class ReceiptPrinterTest {
         basket.add(beans);
         Item oranges = new Item(ORANGES, new PriceDefinition(new BigDecimal("1.99"), Unit.KG), new BigDecimal("0.2"));
         basket.add(oranges);
-        basket.promotionApplied(new ThreeForTwoPromotion(BEANS), beans, new BigDecimal("1.00"));
+//        basket.promotionApplied(new ThreeForTwoPromotion(BEANS), beans, new BigDecimal("1.00"));
         Receipt receipt = new Receipt(basket, new ReceiptSummary(new BigDecimal("1.90"), new BigDecimal("1.40")));
 
         String receiptPrintout = new ReceiptPrinter(receipt).print();

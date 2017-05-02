@@ -1,9 +1,6 @@
 package qmetric.supermarket.domain;
 
-import qmetric.supermarket.domain.promotion.Promotion;
 import qmetric.supermarket.ports.primary.PromitionRepositoryPort;
-
-import java.util.List;
 
 /**
  * Created by andrzejfolga on 01/05/2017.
@@ -11,13 +8,14 @@ import java.util.List;
 public class BasketScanner {
 
     private PromitionRepositoryPort promitionRepositoryPort;
+    private ReceiptBuilder receiptBuilder;
 
-    public BasketScanner(PromitionRepositoryPort promitionRepositoryPort) {
+    public BasketScanner(PromitionRepositoryPort promitionRepositoryPort, ReceiptBuilder receiptBuilder) {
         this.promitionRepositoryPort = promitionRepositoryPort;
+        this.receiptBuilder = receiptBuilder;
     }
 
     public Receipt scan(Basket basket) {
-        ReceiptBuilder receiptBuilder = new ReceiptBuilder(basket);
-        return receiptBuilder.build();
+        return receiptBuilder.build(basket);
     }
 }

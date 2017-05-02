@@ -10,13 +10,7 @@ import java.util.List;
  */
 public class ReceiptBuilder {
 
-    private final Basket basket;
-
-    public ReceiptBuilder(Basket basket) {
-        this.basket = basket;
-    }
-
-    public Receipt build() {
+    public Receipt build(Basket basket) {
         BigDecimal totalToPay = basket.calculatePromotions();
         BigDecimal afterPromotionsSubTotal = basket.calculateRemainder();
         totalToPay = totalToPay.add(afterPromotionsSubTotal);

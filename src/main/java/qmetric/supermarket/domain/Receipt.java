@@ -4,7 +4,6 @@ import qmetric.supermarket.domain.promotion.Promotion;
 import qmetric.supermarket.domain.promotion.PromotionType;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class Receipt {
 
     public Receipt(Basket basket, ReceiptSummary receiptSummary) {
         this.items = basket.getItems();
-        this.promotions = basket.getPromotions();
+        this.promotions = basket.getAllPromotions();
         this.promotionSavings = basket.getSavings();
         this.receiptSummary = receiptSummary;
     }
